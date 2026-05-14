@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>True Story Vids</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ink: #0d0a07;
+      --cream: #f5f0e8;
+      --gold: #c8922a;
+      --gold-light: #e8b84b;
+      --red: #b8292f;
+      --warm-grey: #8c8070;
+      --tape: #e2d8c4;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--ink);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* CUSTOM CURSOR */
+    .cursor {
+      position: fixed;
+      width: 12px; height: 12px;
+      background: var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+      mix-blend-mode: normal;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 40px; height: 40px;
+      border: 1px solid rgba(200,146,42,0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s ease-out, width 0.3s, height 0.3s;
+    }
+
+    /* GRAIN OVERLAY */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9000;
+      opacity: 0.35;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 28px 60px;
+      mix-blend-mode: normal;
+    }
+    nav::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(13,10,7,0.95), transparent);
+      pointer-events: none;
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--cream);
+      position: relative;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--gold); }
+    .nav-links {
+      display: flex;
+      gap: 48px;
+      list-style: none;
+      position: relative;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--warm-grey);
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--cream); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 60px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 70% 40%, rgba(184,41,47,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 20% 70%, rgba(200,146,42,0.1) 0%, transparent 60%),
+        var(--ink);
+    }
+
+    .film-strip {
+      position: absolute;
+      top: 0; right: 120px;
+      width: 80px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      opacity: 0.12;
+    }
+    .film-hole {
+      width: 80px;
+      height: 60px;
+      border: 3px solid var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .film-hole::after {
+      content: '';
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--cream);
+    }
+
+    .hero-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .hero-eyebrow-line {
+      width: 48px;
+      height: 1px;
+      background: var(--gold);
+    }
+    .hero-eyebrow-text {
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(4rem, 10vw, 9rem);
+      font-weight: 900;
+      line-height: 0.9;
+      position: relative;
+      margin-bottom: 40px;
+    }
+    .hero-title .line-1 { display: block; color: var(--cream); }
+    .hero-title .line-2 {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--gold);
+      font-style: italic;
+    }
+    .hero-title .line-3 { display: block; color: var(--cream); }
+
+    .hero-sub {
+      max-width: 480px;
+      line-height: 1.7;
+      color: var(--warm-grey);
+      font-size: 1rem;
+      margin-bottom: 48px;
+    }
+
+    .hero-cta {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--gold);
+      color: var(--ink);
+      padding: 16px 36px;
+      text-decoration: none;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .btn-secondary {
+      color: var(--warm-grey);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--warm-grey);
+      padding-bottom: 2px;
+      transition: color 0.3s, border-color 0.3s;
+    }
+    .btn-secondary:hover { color: var(--cream); border-color: var(--cream); }
+
+    .hero-scroll {
+      position: absolute;
+      right: 60px;
+      bottom: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--warm-grey);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      writing-mode: vertical-rl;
+    }
+    .hero-scroll::after {
+      content: '';
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollLine 2s ease-in-out infinite;
+    }
+    @keyframes scrollLine {
+      0%, 100% { opacity: 1; transform: scaleY(1); }
+      50% { opacity: 0.3; transform: scaleY(0.5); }
+    }
+
+    /* SECTIONS SHARED */
+    section { position: relative; overflow: hidden; }
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .section-label-num {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .section-label-line { width: 32px; height: 1px; background: var(--gold); }
+    .section-label-text {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--warm-grey);
+      text-transform: uppercase;
+    }
+
+    /* ABOUT */
+    .about {
+      padding: 140px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .about-left { position: relative; }
+    .about-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 32px;
+    }
+    .about-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .about-body {
+      color: var(--warm-grey);
+      line-height: 1.9;
+      font-size: 1rem;
+      margin-bottom: 32px;
+    }
+    .about-body strong { color: var(--cream); font-weight: 500; }
+
+    .stats-row {
+      display: flex;
+      gap: 48px;
+      margin-top: 48px;
+      padding-top: 48px;
+      border-top: 1px solid rgba(140,128,112,0.2);
+    }
+    .stat { }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--warm-grey);
+      margin-top: 6px;
+    }
+
+    .about-right {
+      position: relative;
+    }
+    .about-visual {
+      position: relative;
+      aspect-ratio: 3/4;
+      background: linear-gradient(135deg, rgba(184,41,47,0.15), rgba(200,146,42,0.08));
+      border: 1px solid rgba(200,146,42,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .about-visual::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: conic-gradient(from 0deg at 50% 50%,
+        transparent 0deg,
+        rgba(200,146,42,0.05) 60deg,
+        transparent 120deg,
+        rgba(184,41,47,0.04) 180deg,
+        transparent 240deg,
+        rgba(200,146,42,0.05) 300deg,
+        transparent 360deg);
+      animation: spin 20s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .camera-icon {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+    .camera-icon svg { width: 80px; height: 80px; opacity: 0.4; }
+    .camera-icon p {
+      margin-top: 16px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-style: italic;
+      color: var(--gold);
+      opacity: 0.6;
+    }
+
+    .tape-element {
+      position: absolute;
+      top: -20px; left: 40px;
+      width: 60px; height: 18px;
+      background: rgba(226,216,196,0.15);
+      transform: rotate(-3deg);
+    }
+    .tape-element-2 {
+      position: absolute;
+      bottom: 30px; right: -10px;
+      width: 40px; height: 14px;
+      background: rgba(226,216,196,0.12);
+      transform: rotate(5deg);
+    }
+
+    /* PLATFORMS */
+    .platforms {
+      padding: 140px 60px;
+      background: linear-gradient(to bottom, transparent, rgba(200,146,42,0.04), transparent);
+    }
+    .platforms-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 80px;
+    }
+    .platforms-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .platforms-title em { font-style: italic; color: var(--gold); }
+    .platforms-desc {
+      max-width: 320px;
+      color: var(--warm-grey);
+      line-height: 1.7;
+      font-size: 0.9rem;
+    }
+
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+    .platform-card {
+      position: relative;
+      padding: 52px 36px;
+      background: rgba(245,240,232,0.03);
+      border: 1px solid rgba(140,128,112,0.15);
+      transition: background 0.4s, border-color 0.4s, transform 0.3s;
+      overflow: hidden;
+      cursor: none;
+    }
+    .platform-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 2px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .platform-card.facebook::before { background: #1877F2; }
+    .platform-card.youtube::before { background: #FF0000; }
+    .platform-card.telegram::before { background: #26A5E4; }
+    .platform-card.tiktok::before { background: #69C9D0; }
+
+    .platform-card:hover {
+      background: rgba(245,240,232,0.06);
+      border-color: rgba(200,146,42,0.25);
+      transform: translateY(-4px);
+    }
+    .platform-card:hover::before { transform: scaleX(1); }
+
+    .platform-icon {
+      width: 52px; height: 52px;
+      margin-bottom: 28px;
+      position: relative;
+    }
+    .platform-icon svg { width: 100%; height: 100%; }
+    .platform-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .platform-desc {
+      color: var(--warm-grey);
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+    .platform-tag {
+      display: inline-block;
+      margin-top: 24px;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(200,146,42,0.3);
+      padding: 4px 10px;
+    }
+
+    /* VISION */
+    .vision {
+      padding: 140px 60px;
+      text-align: center;
+      position: relative;
+    }
+    .vision::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(184,41,47,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .vision-quote-mark {
+      font-family: 'Playfair Display', serif;
+      font-size: 12rem;
+      line-height: 0.7;
+      color: var(--gold);
+      opacity: 0.08;
+      position: absolute;
+      top: 80px; left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .vision-content { position: relative; z-index: 1; }
+    .vision-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700;
+      margin-bottom: 48px;
+      line-height: 1.2;
+    }
+    .vision-title em { font-style: italic; color: var(--gold); }
+
+    .vision-statement {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      font-style: italic;
+      line-height: 1.6;
+      color: var(--cream);
+      max-width: 800px;
+      margin: 0 auto 64px;
+    }
+
+    .vision-pillars {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin-top: 80px;
+    }
+    .pillar {
+      padding: 48px 56px;
+      border: 1px solid rgba(140,128,112,0.15);
+      position: relative;
+      text-align: left;
+      flex: 1;
+      max-width: 280px;
+      transition: background 0.3s;
+    }
+    .pillar:hover { background: rgba(245,240,232,0.03); }
+    .pillar-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-weight: 900;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(200,146,42,0.3);
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+    .pillar-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .pillar-desc {
+      color: var(--warm-grey);
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 60px;
+      border-top: 1px solid rgba(140,128,112,0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .footer-logo span { color: var(--gold); }
+    .footer-copy {
+      color: var(--warm-grey);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+    .footer-links {
+      display: flex;
+      gap: 32px;
+    }
+    .footer-links a {
+      color: var(--warm-grey);
+      text-decoration: none;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--cream); }
+
+    /* ANIMATIONS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* DIVIDER */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(140,128,112,0.2), transparent);
+      margin: 0 60px;
+      width: calc(100% - 120px);
+    }
+
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      .hero { padding: 0 24px 60px; }
+      .hero-scroll { display: none; }
+      .about { grid-template-columns: 1fr; padding: 80px 24px; gap: 40px; }
+      .about-right { display: none; }
+      .platforms { padding: 80px 24px; }
+      .platforms-header { flex-direction: column; gap: 24px; align-items: flex-start; }
+      .platforms-grid { grid-template-columns: 1fr 1fr; }
+      .vision { padding: 80px 24px; }
+      .vision-pillars { flex-direction: column; align-items: center; }
+      .pillar { max-width: 100%; width: 100%; }
+      footer { flex-direction: column; gap: 24px; padding: 40px 24px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+      .divider { margin: 0 24px; width: calc(100% - 48px); }
+      .stats-row { gap: 24px; }
+      .film-strip { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">True Story <span>Vids</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#platforms">Platforms</a></li>
+      <li><a href="#vision">Vision</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="film-strip" id="filmStrip"></div>
+
+    <div class="hero-eyebrow reveal">
+      <div class="hero-eyebrow-line"></div>
+      <span class="hero-eyebrow-text">True Story Vids — Est. Since Day One</span>
+    </div>
+
+    <h1 class="hero-title">
+      <span class="line-1 reveal reveal-delay-1">Real Lives.</span>
+      <span class="line-2 reveal reveal-delay-2">Untold</span>
+      <span class="line-3 reveal reveal-delay-3">Stories.</span>
+    </h1>
+
+    <p class="hero-sub reveal reveal-delay-4">
+      We find the true stories behind extraordinary films — and bring them to life for audiences across the world.
+    </p>
+
+    <div class="hero-cta reveal reveal-delay-4">
+      <a href="#platforms" class="btn-primary">
+        Watch Now
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#about" class="btn-secondary">Our Story</a>
+    </div>
+
+    <div class="hero-scroll">Scroll</div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="about-left">
+      <div class="section-label reveal">
+        <span class="section-label-num">01</span>
+        <div class="section-label-line"></div>
+        <span class="section-label-text">About Us</span>
+      </div>
+
+      <h2 class="about-title reveal reveal-delay-1">
+        Where <em>Cinema</em><br>Meets Truth
+      </h2>
+
+      <p class="about-body reveal reveal-delay-2">
+        <strong>True Story Vids</strong> is a content creation channel dedicated to exploring the real events behind the world's most compelling true story movies. From survival epics to crime dramas, we go beyond the screen to uncover what really happened.
+      </p>
+      <p class="about-body reveal reveal-delay-3">
+        Our team of passionate storytellers researches, scripts, and produces engaging video content that bridges the gap between <strong>Hollywood's version</strong> and the raw, unfiltered truth — keeping audiences informed, entertained, and deeply moved.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat reveal reveal-delay-1">
+          <div class="stat-num" data-target="4">0</div>
+          <div class="stat-label">Platforms</div>
+        </div>
+        <div class="stat reveal reveal-delay-2">
+          <div class="stat-num" data-target="100" data-suffix="+">0</div>
+          <div class="stat-label">Stories Told</div>
+        </div>
+        <div class="stat reveal reveal-delay-3">
+          <div class="stat-num" data-target="50" data-suffix="K+">0</div>
+          <div class="stat-label">Total Audience</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-right reveal reveal-delay-2">
+      <div class="tape-element"></div>
+      <div class="tape-element-2"></div>
+      <div class="about-visual">
+        <div class="camera-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" xmlns="http://www.w3.org/2000/svg" style="color: var(--gold)">
+            <path d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+          </svg>
+          <p>"Based on a True Story"</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PLATFORMS -->
+  <section class="platforms" id="platforms">
+    <div class="platforms-header">
+      <div>
+        <div class="section-label reveal">
+          <span class="section-label-num">02</span>
+          <div class="section-label-line"></div>
+          <span class="section-label-text">Where to Find Us</span>
+        </div>
+        <h2 class="platforms-title reveal reveal-delay-1">Our <em>Platforms</em></h2>
+      </div>
+      <p class="platforms-desc reveal reveal-delay-2">Find True Story Vids across four major platforms — each tailored to a different way of experiencing our content.</p>
+    </div>
+
+    <div class="platforms-grid">
+
+      <!-- Facebook -->
+      <div class="platform-card facebook reveal reveal-delay-1">
+        <div class="platform-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="color:#1877F2" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+          </svg>
+        </div>
+        <h3 class="platform-name">Facebook</h3>
+        <p class="platform-desc">Deep-dive posts, photo essays, and community discussions around real story films.</p>
+        <span class="platform-tag">Community Hub</span>
+      </div>
+
+      <!-- YouTube -->
+      <div class="platform-card youtube reveal reveal-delay-2">
+        <div class="platform-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="color:#FF0000" xmlns="http://www.w3.org/2000/svg">
+            <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+          </svg>
+        </div>
+        <h3 class="platform-name">YouTube</h3>
+        <p class="platform-desc">Full-length video essays and mini-documentaries exploring stories behind the films.</p>
+        <span class="platform-tag">Main Channel</span>
+      </div>
+
+      <!-- Telegram -->
+      <div class="platform-card telegram reveal reveal-delay-3">
+        <div class="platform-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="color:#26A5E4" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.244-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+          </svg>
+        </div>
+        <h3 class="platform-name">Telegram</h3>
+        <p class="platform-desc">Exclusive updates, behind-the-scenes research, and early content drops for subscribers.</p>
+        <span class="platform-tag">Exclusive Drops</span>
+      </div>
+
+      <!-- TikTok -->
+      <div class="platform-card tiktok reveal reveal-delay-4">
+        <div class="platform-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="color:#69C9D0" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+          </svg>
+        </div>
+        <h3 class="platform-name">TikTok</h3>
+        <p class="platform-desc">Short, punchy clips highlighting the most shocking real-life moments from true story films.</p>
+        <span class="platform-tag">Short Form</span>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- VISION -->
+  <section class="vision" id="vision">
+    <div class="vision-quote-mark">"</div>
+    <div class="vision-content">
+      <div class="section-label reveal" style="justify-content:center">
+        <span class="section-label-num">03</span>
+        <div class="section-label-line"></div>
+        <span class="section-label-text">Our Vision</span>
+      </div>
+
+      <h2 class="vision-title reveal reveal-delay-1">Beyond the <em>Credits</em></h2>
+
+      <p class="vision-statement reveal reveal-delay-2">
+        "To become the world's most trusted voice for true story cinema — honoring the real people behind the screen, and bringing their experiences to every corner of the globe."
+      </p>
+
+      <div class="vision-pillars">
+        <div class="pillar reveal reveal-delay-1">
+          <div class="pillar-num">01</div>
+          <h3 class="pillar-name">Truth First</h3>
+          <p class="pillar-desc">We research deeply and report honestly, always separating fact from dramatization.</p>
+        </div>
+        <div class="pillar reveal reveal-delay-2">
+          <div class="pillar-num">02</div>
+          <h3 class="pillar-name">Global Reach</h3>
+          <p class="pillar-desc">Stories that transcend borders, told for audiences across every continent and culture.</p>
+        </div>
+        <div class="pillar reveal reveal-delay-3">
+          <div class="pillar-num">03</div>
+          <h3 class="pillar-name">Human Impact</h3>
+          <p class="pillar-desc">Every story is a human life. We treat it with the respect and care it deserves.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">True Story <span>Vids</span></div>
+    <span class="footer-copy">© 2025 True Story Vids. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="#about">About</a>
+      <a href="#platforms">Platforms</a>
+      <a href="#vision">Vision</a>
+    </div>
+  </footer>
+
+  <script>
+    // Cursor
+    const cursor = document.getElementById('cursor');
+    const cursorRing = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+    });
+    function animateRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      cursorRing.style.left = rx + 'px';
+      cursorRing.style.top = ry + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    // Film strip
+    const filmStrip = document.getElementById('filmStrip');
+    if (filmStrip) {
+      for (let i = 0; i < 30; i++) {
+        const hole = document.createElement('div');
+        hole.className = 'film-hole';
+        filmStrip.appendChild(hole);
+      }
+    }
+
+    // Reveal on scroll
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Trigger hero reveals immediately
+    setTimeout(() => {
+      document.querySelectorAll('.hero .reveal').forEach(el => el.classList.add('visible'));
+    }, 200);
+
+    // Counter animation
+    function animateCounter(el) {
+      const target = parseInt(el.dataset.target);
+      const suffix = el.dataset.suffix || '';
+      let current = 0;
+      const duration = 1500;
+      const step = target / (duration / 16);
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = Math.floor(current) + suffix;
+        if (current >= target) clearInterval(timer);
+      }, 16);
+    }
+
+    const statNums = document.querySelectorAll('.stat-num[data-target]');
+    const statObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          animateCounter(e.target);
+          statObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    statNums.forEach(el => statObserver.observe(el));
+
+    // Platform card hover cursor
+    document.querySelectorAll('.platform-card, .btn-primary, .btn-secondary, a').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.width = '24px';
+        cursor.style.height = '24px';
+        cursor.style.background = 'var(--gold-light)';
+        cursorRing.style.width = '60px';
+        cursorRing.style.height = '60px';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.width = '12px';
+        cursor.style.height = '12px';
+        cursor.style.background = 'var(--gold)';
+        cursorRing.style.width = '40px';
+        cursorRing.style.height = '40px';
+      });
+    });
+  </script>
+</body>
+</html>
